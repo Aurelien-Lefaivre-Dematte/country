@@ -1,34 +1,45 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import { useState, useEffect } from "react"
+import ListCard from "./components/ListCard"
 
 function App() {
-  const [count, setCount] = useState(0)
+  const [countries, setCountries] = useState()
 
+  useEffect(() => {
+
+    fetch("https://restcountries.com/v3.1/region/europe")
+    .then(data => data.json())
+    .then(data => {
+      console.log(data);
+      data.sort((a,b) => {
+        if(a.name.common < b.name.common) {
+          return -1
+        }
+        else if(a.name.common > b.name.common) {
+          return 1
+        }
+        else {
+          return 0
+        }
+      })
+      setCountries(data)
+    })
+
+  }, [])
+  
   return (
-    <>
-      <div>
-        <a href="https://vitejs.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
+    <div className="min-h-screen bg-slate-800">
+      <div className="max-w-7xl mx-auto py-20 px-4">
+        <h1 className="text-gray-50 text-4xl">Information sur les pays d'Europe</h1>
+        <p className="text-gray-100 text-xl mb-8">Cliquez sur une carte pour avoir les informations du pays.</p>
+        {countries && (
+          <ul className="grid min-[450px]:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-10 auto-rows-[200px]">
+            {countries.map((country, index) => (
+              <ListCard key={index} country={country} />
+            ))}
+          </ul>
+        )}
       </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.jsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
+    </div>
   )
 }
 
